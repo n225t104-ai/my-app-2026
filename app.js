@@ -1,12 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 地図の初期化 (親しみやすいスタイルのタイルに変更)
+    // 地図の初期化 (日本語ラベルを優先するタイルに変更)
     const map = L.map('map').setView([35.6812, 139.7671], 5);
 
-    // CartoDB Voyagerタイル (明るく可愛い感じ)
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-        subdomains: 'abcd',
-        maxZoom: 20
+    // OpenStreetMap Japan (日本語表記を優先)
+    L.tileLayer('https://{s}.tile.openstreetmap.jp/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://openstreetmap.jp/">OpenStreetMap Japan</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+        maxZoom: 19
     }).addTo(map);
 
     let spots = JSON.parse(localStorage.getItem('travel_spots') || '[]');

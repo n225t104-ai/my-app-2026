@@ -13,6 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const form = document.getElementById('record-form');
     const spotList = document.getElementById('spot-list');
     const cancelBtn = document.getElementById('cancel-btn');
+    const fabAdd = document.getElementById('fab-add');
+    const searchBtn = document.getElementById('search-btn');
+    const searchInput = document.getElementById('map-search');
 
     // 初期データの描画
     renderSpots();
@@ -21,6 +24,47 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('click', (e) => {
         currentClickLatLng = e.latlng;
         modal.classList.remove('hidden');
+    });
+
+    // ＋ボタンをクリックした時の処理 (地図の中心にピンを立てる準備)
+    fabAdd.addEventListener('click', () => {
+        currentClickLatLng = map.getCenter();
+        modal.classList.remove('hidden');
+    });
+
+    // 検索機能 (Nominatim APIを使用)
+    searchBtn.addEventListener('click', async () => {
+        const query = searchInput.value;
+        if (!query) return;
+
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            if (data && data.length > 0) {
+                const result = data[0];
+                const latlng = [parseFloat(result.lat), parseFloat(result.lon)];
+                map.setView(latlng, 15);
+                
+                // 検索結果の場所にすぐ記録できるよう、座標を保持
+                currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
+                
+                // ヒントを表示（オプション）
+                searchInput.value = result.display_name;
+            } else {
+                alert('場所が見つかりませんでした。');
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            alert('検索中にエラーが発生しました。');
+        }
+    });
+
+    // Enterキーでも検索できるように
+    searchInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            searchBtn.click();
+        }
     });
 
     // キャンセルボタン

@@ -180,6 +180,68 @@ button {
     margin-top: 4px;
 }
 
+/* Search Bar */
+#search-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    gap: 10px;
+    width: 90%;
+    max-width: 500px;
+    background: white;
+    padding: 10px;
+    border-radius: 50px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+}
+
+#map-search {
+    flex: 1;
+    border: none;
+    padding: 8px 15px;
+    font-size: 1rem;
+    outline: none;
+    border-radius: 50px;
+}
+
+#search-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Floating Action Button */
+#fab-add {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: white;
+    font-size: 2rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s, background 0.2s;
+}
+
+#fab-add:hover {
+    transform: scale(1.1);
+    background: #2980b9;
+}
+
 /* Leaflet Popup customization */
 .leaflet-popup-content img {
     max-width: 100%;

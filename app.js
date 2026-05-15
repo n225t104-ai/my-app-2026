@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const spotList = document.getElementById('spot-list');
     const cancelBtn = document.getElementById('cancel-btn');
     const fabAdd = document.getElementById('fab-add');
-    const searchBtn = document.getElementById('search-btn');
     const searchInput = document.getElementById('map-search');
     const galleryBtn = document.getElementById('gallery-btn');
     const galleryOverlay = document.getElementById('gallery-overlay');
@@ -84,7 +83,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // 検索機能
-    searchBtn.addEventListener('click', async () => {
+    async function performSearch() {
         const query = searchInput.value;
         if (!query) return;
 
@@ -97,17 +96,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 const latlng = [parseFloat(result.lat), parseFloat(result.lon)];
                 map.setView(latlng, 15);
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
-                searchInput.value = result.display_name.split(',')[0]; // 名前を少し短く
+                searchInput.value = result.display_name.split(',')[0];
             } else {
                 alert('場所が見つかりませんでした。');
             }
         } catch (error) {
             console.error('Search error:', error);
         }
-    });
+    }
 
     searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') searchBtn.click();
+        if (e.key === 'Enter') performSearch();
     });
 
     // キャンセルボタン

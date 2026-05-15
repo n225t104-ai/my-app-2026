@@ -118,31 +118,28 @@ header p {
     transform: translateX(-50%);
     z-index: 1000;
     display: flex;
+    align-items: center;
     width: 90%;
     max-width: 450px;
     background: white;
-    padding: 6px;
+    padding: 6px 15px;
     border-radius: 50px;
     box-shadow: var(--shadow);
+}
+
+.search-icon {
+    font-size: 0.9rem;
+    color: #ccc;
+    margin-right: 5px;
 }
 
 #map-search {
     flex: 1;
     border: none;
-    padding: 8px 20px;
+    padding: 8px 10px;
     font-size: 0.9rem;
     outline: none;
     background: transparent;
-}
-
-#search-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 8px 15px;
-    font-size: 0.8rem;
-    border-radius: 50px;
-    cursor: pointer;
 }
 
 /* Gallery Modal */

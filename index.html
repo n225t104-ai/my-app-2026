@@ -15,7 +15,8 @@
                 <p>思い出の場所を地図に残そう</p>
             </header>
             <div id="controls">
-                <button id="export-btn" class="secondary-btn">データ保存 (JSON)</button>
+                <button id="gallery-btn" class="primary-btn">写真ギャラリー</button>
+                <button id="export-btn" class="secondary-btn">データ保存</button>
             </div>
             <ul id="spot-list">
                 <!-- 記録がここに表示されます -->
@@ -29,6 +30,19 @@
             <div id="map"></div>
             <button id="fab-add" title="新しい思い出を追加">+</button>
         </main>
+    </div>
+
+    <!-- ギャラリーモーダル -->
+    <div id="gallery-overlay" class="hidden">
+        <div id="gallery-modal">
+            <header class="modal-header">
+                <h2>写真ギャラリー</h2>
+                <button id="close-gallery" class="close-btn">&times;</button>
+            </header>
+            <div id="gallery-content">
+                <!-- 写真がここに並びます -->
+            </div>
+        </div>
     </div>
 
     <!-- 入力モーダル -->

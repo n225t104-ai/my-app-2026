@@ -16,9 +16,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const fabAdd = document.getElementById('fab-add');
     const searchBtn = document.getElementById('search-btn');
     const searchInput = document.getElementById('map-search');
+    const galleryBtn = document.getElementById('gallery-btn');
+    const galleryOverlay = document.getElementById('gallery-overlay');
+    const closeGallery = document.getElementById('close-gallery');
+    const galleryContent = document.getElementById('gallery-content');
 
     // 初期データの描画
     renderSpots();
+
+    // ギャラリー表示
+    galleryBtn.addEventListener('click', () => {
+        renderGallery();
+        galleryOverlay.classList.remove('hidden');
+    });
+
+    closeGallery.addEventListener('click', () => {
+        galleryOverlay.classList.add('hidden');
+    });
+
+    function renderGallery() {
+        galleryContent.innerHTML = '';
+        const spotsWithPhotos = spots.filter(s => s.photo);
+
+        if (spotsWithPhotos.length === 0) {
+            galleryContent.innerHTML = '<p>写真がありません。地図に思い出を追加してください。</p>';
+            return;
+        }
+
+        spotsWithPhotos.forEach(spot => {
+            const div = document.createElement('div');
+            div.className = 'gallery-item';
+            div.innerHTML = `
+                <img src="${spot.photo}" alt="${spot.title}">
+                <div class="overlay">${spot.title}</div>
+            `;
+            div.addEventListener('click', () => {
+                galleryOverlay.classList.add('hidden');
+                map.setView([spot.lat, spot.lng], 15);
+                // 対応するマーカーを探してポップアップを開く
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Marker && layer.getLatLng().lat === spot.lat && layer.getLatLng().lng === spot.lng) {
+                        layer.openPopup();
+                    }
+                });
+            });
+            galleryContent.appendChild(div);
+        });
+    }
 
     // 地図をクリックした時の処理
     map.on('click', (e) => {

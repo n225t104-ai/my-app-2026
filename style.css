@@ -238,8 +238,8 @@ header p {
     opacity: 1;
 }
 
-/* Custom Delete Modal */
-#confirm-overlay {
+/* Custom Delete & Error Modals */
+#confirm-overlay, #error-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -253,11 +253,11 @@ header p {
     z-index: 4000;
 }
 
-#confirm-overlay.hidden {
+#confirm-overlay.hidden, #error-overlay.hidden {
     display: none;
 }
 
-#confirm-modal {
+#confirm-modal, #error-modal {
     background: white;
     padding: 30px;
     border-radius: var(--border-radius);
@@ -514,4 +514,146 @@ button:hover {
     #input-modal {
         padding: 20px;
     }
+}
+
+/* Calendar Modal Styles */
+#calendar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+}
+
+#calendar-overlay.hidden {
+    display: none;
+}
+
+#calendar-modal {
+    background: white;
+    width: 90%;
+    max-width: 500px;
+    border-radius: var(--border-radius);
+    padding: 20px;
+    box-shadow: var(--shadow);
+    display: flex;
+    flex-direction: column;
+}
+
+.calendar-nav {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.nav-btn {
+    background: #f0f0f0;
+    border: none;
+    border-radius: 50%;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 0;
+    min-width: auto;
+}
+
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    text-align: center;
+    font-weight: bold;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 10px;
+}
+
+#calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    transition: background 0.2s;
+    position: relative;
+}
+
+.calendar-day:hover {
+    background: #f0f0f0;
+}
+
+.calendar-day.today {
+    color: var(--accent-color);
+    font-weight: bold;
+    border: 1px solid var(--accent-color);
+}
+
+.calendar-day.has-spot::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    width: 4px;
+    height: 4px;
+    background: var(--accent-color);
+    border-radius: 50%;
+}
+
+.calendar-day.selected {
+    background: var(--accent-color);
+    color: white;
+}
+
+.calendar-day.empty {
+    cursor: default;
+}
+
+.calendar-day.empty:hover {
+    background: none;
+}
+
+#calendar-day-details {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #eee;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+#selected-date-label {
+    font-size: 0.9rem;
+    margin-bottom: 10px;
+    color: #666;
+}
+
+#day-spot-list {
+    list-style: none;
+}
+
+.day-spot-item {
+    padding: 8px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    margin-bottom: 5px;
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.day-spot-item:hover {
+    background: #f0f0f0;
 }

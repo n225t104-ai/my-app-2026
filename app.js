@@ -25,6 +25,107 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeGallery = document.getElementById('close-gallery');
     const galleryContent = document.getElementById('gallery-content');
 
+    // カレンダー用
+    const calendarBtn = document.getElementById('calendar-btn');
+    const calendarOverlay = document.getElementById('calendar-overlay');
+    const closeCalendar = document.getElementById('close-calendar');
+    const calendarGrid = document.getElementById('calendar-grid');
+    const calendarMonthYear = document.getElementById('calendar-month-year');
+    const prevMonthBtn = document.getElementById('prev-month');
+    const nextMonthBtn = document.getElementById('next-month');
+    const dayDetails = document.getElementById('calendar-day-details');
+    const selectedDateLabel = document.getElementById('selected-date-label');
+    const daySpotList = document.getElementById('day-spot-list');
+
+    let currentCalendarDate = new Date();
+
+    calendarBtn.addEventListener('click', () => {
+        renderCalendar();
+        calendarOverlay.classList.remove('hidden');
+        if (window.innerWidth <= 768) toggleSidebar();
+    });
+
+    closeCalendar.addEventListener('click', () => {
+        calendarOverlay.classList.add('hidden');
+    });
+
+    prevMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+        renderCalendar();
+    });
+
+    nextMonthBtn.addEventListener('click', () => {
+        currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+        renderCalendar();
+    });
+
+    function renderCalendar() {
+        calendarGrid.innerHTML = '';
+        const year = currentCalendarDate.getFullYear();
+        const month = currentCalendarDate.getMonth();
+        calendarMonthYear.textContent = `${year}年${month + 1}月`;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+        // 空白の追加
+        for (let i = 0; i < firstDay; i++) {
+            const div = document.createElement('div');
+            div.className = 'calendar-day empty';
+            calendarGrid.appendChild(div);
+        }
+
+        const today = new Date();
+        const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const div = document.createElement('div');
+            div.className = 'calendar-day';
+            div.textContent = day;
+
+            if (dateStr === todayStr) div.classList.add('today');
+
+            const spotsOnDay = spots.filter(s => s.date === dateStr);
+            if (spotsOnDay.length > 0) div.classList.add('has-spot');
+
+            div.addEventListener('click', () => {
+                document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+                div.classList.add('selected');
+                showDayDetails(dateStr, spotsOnDay);
+            });
+
+            calendarGrid.appendChild(div);
+        }
+    }
+
+    function showDayDetails(dateStr, daySpots) {
+        selectedDateLabel.textContent = dateStr.replace(/-/g, '/');
+        daySpotList.innerHTML = '';
+        dayDetails.classList.remove('hidden');
+
+        if (daySpots.length === 0) {
+            daySpotList.innerHTML = '<li>この日の記録はありません</li>';
+            return;
+        }
+
+        daySpots.forEach(spot => {
+            const li = document.createElement('li');
+            li.className = 'day-spot-item';
+            li.textContent = spot.title;
+            li.addEventListener('click', () => {
+                calendarOverlay.classList.add('hidden');
+                map.setView([spot.lat, spot.lng], 15);
+                map.eachLayer((layer) => {
+                    if (layer instanceof L.Marker && layer.getLatLng().lat === spot.lat && layer.getLatLng().lng === spot.lng) {
+                        layer.openPopup();
+                    }
+                });
+            });
+            daySpotList.appendChild(li);
+        });
+    }
+
     // モバイル用サイドバー操作
     const sidebar = document.getElementById('sidebar');
     const sidebarToggle = document.getElementById('sidebar-toggle');
@@ -42,6 +143,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const confirmOverlay = document.getElementById('confirm-overlay');
     const confirmCancel = document.getElementById('confirm-cancel');
     const confirmDelete = document.getElementById('confirm-delete');
+
+    // 検索エラーモーダル用
+    const errorOverlay = document.getElementById('error-overlay');
+    const errorClose = document.getElementById('error-close');
+
+    errorClose.addEventListener('click', () => {
+        errorOverlay.classList.add('hidden');
+    });
 
     // 初期データの描画
     renderSpots();
@@ -89,12 +198,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // 地図をクリックした時の処理
     map.on('click', (e) => {
         currentClickLatLng = e.latlng;
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
         modal.classList.remove('hidden');
     });
 
     // ＋ボタンをクリックした時の処理
     fabAdd.addEventListener('click', () => {
         currentClickLatLng = map.getCenter();
+        document.getElementById('date').value = new Date().toISOString().split('T')[0];
         modal.classList.remove('hidden');
     });
 
@@ -124,10 +235,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     toggleSidebar();
                 }
             } else {
-                alert('場所が見つかりませんでした。');
+                errorOverlay.classList.remove('hidden');
             }
         } catch (error) {
             console.error('Search error:', error);
+            errorOverlay.classList.remove('hidden');
         }
     }
 
@@ -146,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         
         const title = document.getElementById('title').value;
+        const date = document.getElementById('date').value;
         const description = document.getElementById('description').value;
         const photoFile = document.getElementById('photo').files[0];
         
@@ -159,6 +272,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lat: currentClickLatLng.lat,
             lng: currentClickLatLng.lng,
             title,
+            date,
             description,
             photo: photoBase64
         };
@@ -185,15 +299,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // データの描画
     function renderSpots() {
         map.eachLayer((layer) => {
-            if (layer instanceof L.Marker) map.removeLayer(layer);
+            if (layer instanceof L.Marker && !layer.getPopup()?.getContent().includes('ここを記録しますか？')) {
+                map.removeLayer(layer);
+            }
         });
 
         spotList.innerHTML = '';
 
-        spots.forEach(spot => {
+        // 日付順にソートして表示
+        const sortedSpots = [...spots].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        sortedSpots.forEach(spot => {
             const marker = L.marker([spot.lat, spot.lng]).addTo(map);
             const popupContent = `
                 <div class="custom-popup">
+                    <div style="font-size: 0.75rem; color: #888; margin-bottom: 2px;">${spot.date.replace(/-/g, '/')}</div>
                     <strong style="font-size: 1rem;">${spot.title}</strong>
                     <p style="margin: 5px 0; color: #666;">${spot.description}</p>
                     ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius: 10px; margin-top: 5px;">` : ''}
@@ -205,6 +325,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const li = document.createElement('li');
             li.className = 'spot-item';
             li.innerHTML = `
+                <div style="font-size: 0.7rem; color: #aaa;">${spot.date.replace(/-/g, '/')}</div>
                 <h3>${spot.title}</h3>
                 <p>${spot.description}</p>
             `;

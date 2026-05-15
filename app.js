@@ -152,9 +152,6 @@ document.addEventListener('DOMContentLoaded', () => {
         errorOverlay.classList.add('hidden');
     });
 
-    // 初期データの描画
-    renderSpots();
-
     // ギャラリー表示
     galleryBtn.addEventListener('click', () => {
         renderGallery();
@@ -299,8 +296,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // データの描画
     function renderSpots() {
         map.eachLayer((layer) => {
-            if (layer instanceof L.Marker && !layer.getPopup()?.getContent().includes('ここを記録しますか？')) {
-                map.removeLayer(layer);
+            if (layer instanceof L.Marker) {
+                const popup = layer.getPopup();
+                if (popup) {
+                    const content = popup.getContent();
+                    // 文字列またはHTML要素の中身をチェック
+                    const contentStr = (typeof content === 'string') ? content : (content instanceof HTMLElement ? content.innerHTML : '');
+                    if (!contentStr.includes('ここを記録しますか？')) {
+                        map.removeLayer(layer);
+                    }
+                } else {
+                    map.removeLayer(layer);
+                }
             }
         });
 
@@ -397,4 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     });
+
+    // 初期データの描画 (最後に実行)
+    renderSpots();
 });

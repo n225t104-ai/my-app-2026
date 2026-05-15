@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const map = L.map('map', { zoomControl: false }).setView([35.6812, 139.7671], 5);
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
-        attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>",
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
         minZoom: 2,
-        maxZoom: 18
+        maxZoom: 19
     }).addTo(map);
 
     let spots = JSON.parse(localStorage.getItem('travel_spots') || '[]');

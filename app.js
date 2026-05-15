@@ -1,13 +1,17 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 地図の初期化
-    const map = L.map('map').setView([35.6812, 139.7671], 5); // 東京駅を中心に表示
+    // 地図の初期化 (親しみやすいスタイルのタイルに変更)
+    const map = L.map('map').setView([35.6812, 139.7671], 5);
 
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // CartoDB Voyagerタイル (明るく可愛い感じ)
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
     }).addTo(map);
 
     let spots = JSON.parse(localStorage.getItem('travel_spots') || '[]');
     let currentClickLatLng = null;
+    let spotToDeleteId = null;
 
     const modal = document.getElementById('modal-overlay');
     const form = document.getElementById('record-form');
@@ -20,6 +24,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const galleryOverlay = document.getElementById('gallery-overlay');
     const closeGallery = document.getElementById('close-gallery');
     const galleryContent = document.getElementById('gallery-content');
+
+    // 削除確認モーダル用
+    const confirmOverlay = document.getElementById('confirm-overlay');
+    const confirmCancel = document.getElementById('confirm-cancel');
+    const confirmDelete = document.getElementById('confirm-delete');
 
     // 初期データの描画
     renderSpots();
@@ -39,7 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const spotsWithPhotos = spots.filter(s => s.photo);
 
         if (spotsWithPhotos.length === 0) {
-            galleryContent.innerHTML = '<p>写真がありません。地図に思い出を追加してください。</p>';
+            galleryContent.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999;">写真がありません。地図に思い出を追加してください。</p>';
             return;
         }
 
@@ -53,7 +62,6 @@ document.addEventListener('DOMContentLoaded', () => {
             div.addEventListener('click', () => {
                 galleryOverlay.classList.add('hidden');
                 map.setView([spot.lat, spot.lng], 15);
-                // 対応するマーカーを探してポップアップを開く
                 map.eachLayer((layer) => {
                     if (layer instanceof L.Marker && layer.getLatLng().lat === spot.lat && layer.getLatLng().lng === spot.lng) {
                         layer.openPopup();
@@ -70,13 +78,13 @@ document.addEventListener('DOMContentLoaded', () => {
         modal.classList.remove('hidden');
     });
 
-    // ＋ボタンをクリックした時の処理 (地図の中心にピンを立てる準備)
+    // ＋ボタンをクリックした時の処理
     fabAdd.addEventListener('click', () => {
         currentClickLatLng = map.getCenter();
         modal.classList.remove('hidden');
     });
 
-    // 検索機能 (Nominatim APIを使用)
+    // 検索機能
     searchBtn.addEventListener('click', async () => {
         const query = searchInput.value;
         if (!query) return;
@@ -89,26 +97,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = data[0];
                 const latlng = [parseFloat(result.lat), parseFloat(result.lon)];
                 map.setView(latlng, 15);
-                
-                // 検索結果の場所にすぐ記録できるよう、座標を保持
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
-                
-                // ヒントを表示（オプション）
-                searchInput.value = result.display_name;
+                searchInput.value = result.display_name.split(',')[0]; // 名前を少し短く
             } else {
                 alert('場所が見つかりませんでした。');
             }
         } catch (error) {
             console.error('Search error:', error);
-            alert('検索中にエラーが発生しました。');
         }
     });
 
-    // Enterキーでも検索できるように
     searchInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            searchBtn.click();
-        }
+        if (e.key === 'Enter') searchBtn.click();
     });
 
     // キャンセルボタン
@@ -154,29 +154,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // データの描画
     function renderSpots() {
-        // 全マーカー削除 (簡易的な実装)
         map.eachLayer((layer) => {
-            if (layer instanceof L.Marker) {
-                map.removeLayer(layer);
-            }
+            if (layer instanceof L.Marker) map.removeLayer(layer);
         });
 
         spotList.innerHTML = '';
 
         spots.forEach(spot => {
-            // マーカー追加
             const marker = L.marker([spot.lat, spot.lng]).addTo(map);
             const popupContent = `
-                <div>
-                    <strong>${spot.title}</strong>
-                    <p>${spot.description}</p>
-                    ${spot.photo ? `<img src="${spot.photo}" style="width:100%">` : ''}
-                    <button class="delete-btn" onclick="deleteSpot(${spot.id})">削除</button>
+                <div class="custom-popup">
+                    <strong style="font-size: 1rem;">${spot.title}</strong>
+                    <p style="margin: 5px 0; color: #666;">${spot.description}</p>
+                    ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius: 10px; margin-top: 5px;">` : ''}
+                    <button class="delete-btn" onclick="openDeleteConfirm(${spot.id})">削除する</button>
                 </div>
             `;
             marker.bindPopup(popupContent);
 
-            // リスト追加
             const li = document.createElement('li');
             li.className = 'spot-item';
             li.innerHTML = `
@@ -191,7 +186,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 画像のリサイズ (LocalStorage対策)
+    // カスタム削除モーダルを開く
+    window.openDeleteConfirm = (id) => {
+        spotToDeleteId = id;
+        confirmOverlay.classList.remove('hidden');
+        map.closePopup();
+    };
+
+    confirmCancel.addEventListener('click', () => {
+        confirmOverlay.classList.add('hidden');
+        spotToDeleteId = null;
+    });
+
+    confirmDelete.addEventListener('click', () => {
+        if (spotToDeleteId) {
+            spots = spots.filter(s => s.id !== spotToDeleteId);
+            saveSpots();
+            renderSpots();
+            confirmOverlay.classList.add('hidden');
+            spotToDeleteId = null;
+        }
+    });
+
     function resizeImage(file) {
         return new Promise((resolve) => {
             const reader = new FileReader();
@@ -204,32 +220,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const MAX_WIDTH = 800;
                     let width = img.width;
                     let height = img.height;
-
                     if (width > MAX_WIDTH) {
                         height *= MAX_WIDTH / width;
                         width = MAX_WIDTH;
                     }
-
                     canvas.width = width;
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // 圧縮
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
                 };
             };
         });
     }
 
-    // グローバルに削除関数を公開 (Popup用)
-    window.deleteSpot = (id) => {
-        if (confirm('この記録を削除しますか？')) {
-            spots = spots.filter(s => s.id !== id);
-            saveSpots();
-            renderSpots();
-        }
-    };
-
-    // エクスポート機能
     document.getElementById('export-btn').addEventListener('click', () => {
         const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(spots));
         const downloadAnchorNode = document.createElement('a');

@@ -1,9 +1,10 @@
 :root {
-    --primary-color: #2c3e50;
-    --accent-color: #3498db;
-    --bg-color: #f8f9fa;
-    --sidebar-width: 350px;
-    --shadow: 0 4px 6px rgba(0,0,0,0.1);
+    --primary-color: #5d6d7e;
+    --accent-color: #ff9fb2; /* 可愛いピンク系 */
+    --bg-color: #ffffff;
+    --sidebar-width: 320px;
+    --shadow: 0 8px 20px rgba(0,0,0,0.08);
+    --border-radius: 20px;
 }
 
 * {
@@ -13,7 +14,7 @@
 }
 
 body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: 'Hiragino Sans', 'Meiryo', sans-serif;
     background-color: var(--bg-color);
     color: var(--primary-color);
     overflow: hidden;
@@ -29,48 +30,59 @@ body {
     width: var(--sidebar-width);
     height: 100%;
     background: white;
-    box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    box-shadow: 4px 0 15px rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
     z-index: 1000;
 }
 
 header {
-    padding: 20px;
-    background: var(--primary-color);
-    color: white;
+    padding: 30px 20px;
+    background: white;
+    color: var(--primary-color);
+    border-bottom: 1px solid #f0f0f0;
+    text-align: center;
 }
 
 header h1 {
-    font-size: 1.5rem;
-    margin-bottom: 5px;
+    font-size: 1.4rem;
+    color: var(--accent-color);
+    letter-spacing: 1px;
 }
 
 header p {
-    font-size: 0.8rem;
-    opacity: 0.8;
+    font-size: 0.75rem;
+    margin-top: 5px;
+    color: #aeb6bf;
 }
 
 #controls {
-    padding: 15px;
-    border-bottom: 1px solid #eee;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
 }
 
 #spot-list {
     flex: 1;
     overflow-y: auto;
-    list-style: none;
+    padding: 10px;
 }
 
 .spot-item {
     padding: 15px;
-    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+    border-radius: 15px;
+    background: #fdfdfd;
+    border: 1px solid #f5f5f5;
     cursor: pointer;
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
 .spot-item:hover {
-    background: #f0f4f8;
+    background: #fffafa;
+    border-color: var(--accent-color);
+    transform: translateY(-2px);
 }
 
 .spot-item h3 {
@@ -96,6 +108,41 @@ header p {
 #map {
     height: 100%;
     width: 100%;
+}
+
+/* Search Bar */
+#search-container {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    display: flex;
+    width: 90%;
+    max-width: 450px;
+    background: white;
+    padding: 6px;
+    border-radius: 50px;
+    box-shadow: var(--shadow);
+}
+
+#map-search {
+    flex: 1;
+    border: none;
+    padding: 8px 20px;
+    font-size: 0.9rem;
+    outline: none;
+    background: transparent;
+}
+
+#search-btn {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    border-radius: 50px;
+    cursor: pointer;
 }
 
 /* Gallery Modal */
@@ -191,6 +238,80 @@ header p {
     opacity: 1;
 }
 
+/* Custom Delete Modal */
+#confirm-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(2px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 4000;
+}
+
+#confirm-overlay.hidden {
+    display: none;
+}
+
+#confirm-modal {
+    background: white;
+    padding: 30px;
+    border-radius: var(--border-radius);
+    text-align: center;
+    width: 320px;
+    box-shadow: var(--shadow);
+}
+
+#confirm-modal h3 {
+    margin-bottom: 10px;
+    font-size: 1.1rem;
+}
+
+#confirm-modal p {
+    font-size: 0.85rem;
+    color: #888;
+    margin-bottom: 20px;
+}
+
+.delete-btn-modal {
+    background: #ff7675;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Floating Action Button */
+#fab-add {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: white;
+    font-size: 1.8rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(255, 159, 178, 0.4);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+#fab-add:hover {
+    transform: rotate(90deg) scale(1.1);
+}
+
 /* Modal */
 #modal-overlay {
     position: fixed;
@@ -198,7 +319,7 @@ header p {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0,0,0,0.5);
+    background: rgba(0,0,0,0.4);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -212,14 +333,15 @@ header p {
 #input-modal {
     background: white;
     padding: 30px;
-    border-radius: 12px;
+    border-radius: var(--border-radius);
     width: 90%;
-    max-width: 500px;
+    max-width: 450px;
     box-shadow: var(--shadow);
 }
 
 #input-modal h2 {
     margin-bottom: 20px;
+    color: var(--primary-color);
 }
 
 .form-group {
@@ -228,18 +350,20 @@ header p {
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
     font-weight: bold;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    color: #7f8c8d;
 }
 
 .form-group input[type="text"],
 .form-group textarea {
     width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    font-size: 1rem;
+    padding: 12px;
+    border: 1px solid #eee;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    background: #f9f9f9;
 }
 
 .button-group {
@@ -249,12 +373,17 @@ header p {
 }
 
 button {
-    padding: 10px 20px;
-    border-radius: 6px;
+    padding: 12px 20px;
+    border-radius: 12px;
     border: none;
     cursor: pointer;
     font-weight: bold;
     flex: 1;
+    transition: opacity 0.2s;
+}
+
+button:hover {
+    opacity: 0.8;
 }
 
 .primary-btn {
@@ -263,7 +392,7 @@ button {
 }
 
 .secondary-btn {
-    background: #e0e0e0;
+    background: #f0f0f0;
     color: var(--primary-color);
 }
 
@@ -273,80 +402,32 @@ button {
     margin-top: 4px;
 }
 
-/* Search Bar */
-#search-container {
-    position: absolute;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 1000;
-    display: flex;
-    gap: 10px;
-    width: 90%;
-    max-width: 500px;
-    background: white;
-    padding: 10px;
-    border-radius: 50px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-}
-
-#map-search {
-    flex: 1;
-    border: none;
-    padding: 8px 15px;
-    font-size: 1rem;
-    outline: none;
-    border-radius: 50px;
-}
-
-#search-btn {
-    background: var(--accent-color);
-    color: white;
-    border: none;
-    padding: 8px 20px;
-    border-radius: 50px;
-    cursor: pointer;
-    font-weight: bold;
-}
-
-/* Floating Action Button */
-#fab-add {
-    position: absolute;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    border-radius: 50%;
-    background: var(--accent-color);
-    color: white;
-    font-size: 2rem;
-    border: none;
-    cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    z-index: 1000;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: transform 0.2s, background 0.2s;
-}
-
-#fab-add:hover {
-    transform: scale(1.1);
-    background: #2980b9;
-}
-
 /* Leaflet Popup customization */
+.leaflet-popup-content-wrapper {
+    border-radius: 15px;
+    padding: 5px;
+    box-shadow: var(--shadow);
+}
+
+.leaflet-popup-content {
+    margin: 10px;
+    font-size: 0.9rem;
+}
+
 .leaflet-popup-content img {
     max-width: 100%;
-    border-radius: 4px;
+    border-radius: 10px;
     margin-top: 10px;
 }
 
 .delete-btn {
-    color: #e74c3c;
+    color: #ff7675;
     background: none;
-    padding: 0;
+    border: none;
+    cursor: pointer;
     font-size: 0.8rem;
+    margin-top: 10px;
+    font-weight: bold;
     text-align: left;
-    margin-top: 5px;
+    padding: 0;
 }

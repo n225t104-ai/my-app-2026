@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // 地図の初期化 (日本語ラベルを優先するタイルに変更)
+    // 地図の初期化 (国土地理院の淡色地図を使用：日本語のみ、海上の線なし)
     const map = L.map('map').setView([35.6812, 139.7671], 5);
 
-    // OpenStreetMap Japan (日本語表記を優先)
-    L.tileLayer('https://{s}.tile.openstreetmap.jp/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://openstreetmap.jp/">OpenStreetMap Japan</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-        maxZoom: 19
+    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
+        attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>",
+        minZoom: 2,
+        maxZoom: 18
     }).addTo(map);
 
     let spots = JSON.parse(localStorage.getItem('travel_spots') || '[]');

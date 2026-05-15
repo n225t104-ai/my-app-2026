@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Tracker - 旅の記録</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="app">
+        <aside id="sidebar">
+            <header>
+                <h1>Travel Tracker</h1>
+                <p>思い出の場所を地図に残そう</p>
+            </header>
+            <div id="controls">
+                <button id="export-btn" class="secondary-btn">データ保存 (JSON)</button>
+            </div>
+            <ul id="spot-list">
+                <!-- 記録がここに表示されます -->
+            </ul>
+        </aside>
+        <main id="map-container">
+            <div id="map"></div>
+        </main>
+    </div>
+
+    <!-- 入力モーダル -->
+    <div id="modal-overlay" class="hidden">
+        <div id="input-modal">
+            <h2>新しい思い出を記録</h2>
+            <form id="record-form">
+                <div class="form-group">
+                    <label for="title">場所の名前</label>
+                    <input type="text" id="title" required placeholder="例: 富士山頂">
+                </div>
+                <div class="form-group">
+                    <label for="description">思い出</label>
+                    <textarea id="description" rows="3" placeholder="どんなことがありましたか？"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="photo">写真</label>
+                    <input type="file" id="photo" accept="image/*">
+                    <p class="hint">※写真はリサイズして保存されます</p>
+                </div>
+                <div class="button-group">
+                    <button type="button" id="cancel-btn" class="secondary-btn">キャンセル</button>
+                    <button type="submit" class="primary-btn">記録する</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+    <script src="app.js"></script>
+</body>
+</html>

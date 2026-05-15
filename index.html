@@ -102,7 +102,10 @@
             <form id="record-form">
                 <div class="form-group">
                     <label for="title">場所の名前</label>
-                    <input type="text" id="title" required placeholder="例: 富士山頂">
+                    <div class="input-with-button">
+                        <input type="text" id="title" required placeholder="例: 富士山頂">
+                        <button type="button" id="modal-search-btn" class="secondary-btn small-btn" title="場所を検索して地図を移動">検索</button>
+                    </div>
                 </div>
                 <div class="form-group">
                     <label for="date">日付</label>

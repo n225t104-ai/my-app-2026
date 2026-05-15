@@ -366,6 +366,18 @@ header p {
     background: #f9f9f9;
 }
 
+.input-with-button {
+    display: flex;
+    gap: 8px;
+}
+
+.small-btn {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 0 15px;
+    font-size: 0.85rem;
+}
+
 .button-group {
     display: flex;
     gap: 10px;

@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let spots = JSON.parse(localStorage.getItem('travel_spots') || '[]');
     let currentClickLatLng = null;
+    let isPreciseLocation = false; // 地図を直接クリックしたかどうか
     let spotToDeleteId = null;
     let searchMarker = null;
 
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const cancelBtn = document.getElementById('cancel-btn');
     const fabAdd = document.getElementById('fab-add');
     const searchInput = document.getElementById('map-search');
+    const modalSearchBtn = document.getElementById('modal-search-btn');
     const galleryBtn = document.getElementById('gallery-btn');
     const galleryOverlay = document.getElementById('gallery-overlay');
     const closeGallery = document.getElementById('close-gallery');
@@ -195,6 +197,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 地図をクリックした時の処理
     map.on('click', (e) => {
         currentClickLatLng = e.latlng;
+        isPreciseLocation = true;
         document.getElementById('date').value = new Date().toISOString().split('T')[0];
         modal.classList.remove('hidden');
     });
@@ -202,8 +205,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // ＋ボタンをクリックした時の処理
     fabAdd.addEventListener('click', () => {
         currentClickLatLng = map.getCenter();
+        isPreciseLocation = false;
         document.getElementById('date').value = new Date().toISOString().split('T')[0];
         modal.classList.remove('hidden');
+    });
+
+    // モーダル内の検索ボタン
+    modalSearchBtn.addEventListener('click', async () => {
+        const title = document.getElementById('title').value;
+        if (!title) return;
+
+        try {
+            const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(title)}`);
+            const data = await response.json();
+            if (data && data.length > 0) {
+                const result = data[0];
+                currentClickLatLng = { lat: parseFloat(result.lat), lng: parseFloat(result.lon) };
+                isPreciseLocation = true; // 検索で見つかった場所を確定とする
+                map.setView([currentClickLatLng.lat, currentClickLatLng.lng], 15);
+                
+                // 地図上に一時的なピンを表示
+                if (searchMarker) map.removeLayer(searchMarker);
+                searchMarker = L.marker([currentClickLatLng.lat, currentClickLatLng.lng]).addTo(map)
+                    .bindPopup(`<b>${title}</b><br>この場所に保存します`)
+                    .openPopup();
+            } else {
+                errorOverlay.classList.remove('hidden');
+            }
+        } catch (error) {
+            console.error('Modal search error:', error);
+            errorOverlay.classList.remove('hidden');
+        }
     });
 
     // 検索機能
@@ -259,6 +291,20 @@ document.addEventListener('DOMContentLoaded', () => {
         const description = document.getElementById('description').value;
         const photoFile = document.getElementById('photo').files[0];
         
+        // ＋ボタンから（直接クリック以外）で記録しようとした場合、タイトルで再検索を試みる
+        if (!isPreciseLocation) {
+            try {
+                const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(title)}`);
+                const data = await response.json();
+                if (data && data.length > 0) {
+                    currentClickLatLng = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+                    map.setView([currentClickLatLng.lat, currentClickLatLng.lng], 15);
+                }
+            } catch (err) {
+                console.error('Submit geocoding error:', err);
+            }
+        }
+
         let photoBase64 = '';
         if (photoFile) {
             photoBase64 = await resizeImage(photoFile);

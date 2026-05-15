@@ -431,3 +431,87 @@ button:hover {
     text-align: left;
     padding: 0;
 }
+
+/* Mobile Responsiveness */
+.mobile-only {
+    display: none;
+}
+
+@media (max-width: 768px) {
+    .mobile-only {
+        display: flex;
+    }
+
+    #sidebar {
+        position: fixed;
+        left: -100%;
+        top: 0;
+        width: 85%;
+        max-width: 320px;
+        transition: left 0.3s ease;
+        z-index: 2500;
+    }
+
+    #sidebar.open {
+        left: 0;
+    }
+
+    /* Sidebar Overlay when open */
+    .sidebar-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0,0,0,0.5);
+        z-index: 2400;
+        display: none;
+    }
+
+    .sidebar-overlay.visible {
+        display: block;
+    }
+
+    #sidebar-toggle {
+        position: absolute;
+        top: 20px;
+        left: 15px;
+        z-index: 1500;
+        background: white;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        box-shadow: var(--shadow);
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    #search-container {
+        width: 70%;
+        left: calc(50% + 25px); /* Offset to avoid toggle button */
+        top: 20px;
+    }
+
+    #gallery-modal {
+        width: 95%;
+        height: 90vh;
+    }
+
+    #gallery-content {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        padding: 10px;
+        gap: 10px;
+    }
+
+    #fab-add {
+        bottom: 20px;
+        right: 20px;
+    }
+
+    #input-modal {
+        padding: 20px;
+    }
+}

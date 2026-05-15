@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     // 地図の初期化 (国土地理院の淡色地図を使用：日本語のみ、海上の線なし)
-    const map = L.map('map').setView([35.6812, 139.7671], 5);
+    const map = L.map('map', { zoomControl: false }).setView([35.6812, 139.7671], 5);
+    L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
     L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
         attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>",
@@ -23,6 +24,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeGallery = document.getElementById('close-gallery');
     const galleryContent = document.getElementById('gallery-content');
 
+    // モバイル用サイドバー操作
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+    function toggleSidebar() {
+        sidebar.classList.toggle('open');
+        sidebarOverlay.classList.toggle('visible');
+    }
+
+    sidebarToggle.addEventListener('click', toggleSidebar);
+    sidebarOverlay.addEventListener('click', toggleSidebar);
+
     // 削除確認モーダル用
     const confirmOverlay = document.getElementById('confirm-overlay');
     const confirmCancel = document.getElementById('confirm-cancel');
@@ -35,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     galleryBtn.addEventListener('click', () => {
         renderGallery();
         galleryOverlay.classList.remove('hidden');
+        if (window.innerWidth <= 768) toggleSidebar();
     });
 
     closeGallery.addEventListener('click', () => {
@@ -97,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 map.setView(latlng, 15);
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
                 searchInput.value = result.display_name.split(',')[0];
+                if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                    toggleSidebar();
+                }
             } else {
                 alert('場所が見つかりませんでした。');
             }
@@ -179,6 +197,9 @@ document.addEventListener('DOMContentLoaded', () => {
             li.addEventListener('click', () => {
                 map.setView([spot.lat, spot.lng], 13);
                 marker.openPopup();
+                if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
+                    toggleSidebar();
+                }
             });
             spotList.appendChild(li);
         });

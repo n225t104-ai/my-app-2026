@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const map = L.map('map', { zoomControl: false }).setView([35.6812, 139.7671], 5);
     L.control.zoom({ position: 'bottomleft' }).addTo(map);
 
-    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png', {
+    L.tileLayer('https://cyberjapandata.gsi.go.jp/xyz/std/{z}/{x}/{y}.png', {
         attribution: "<a href='https://maps.gsi.go.jp/development/ichiran.html' target='_blank'>地理院タイル</a>",
         minZoom: 2,
         maxZoom: 18
@@ -12,6 +12,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let spots = JSON.parse(localStorage.getItem('travel_spots') || '[]');
     let currentClickLatLng = null;
     let spotToDeleteId = null;
+    let searchMarker = null;
 
     const modal = document.getElementById('modal-overlay');
     const form = document.getElementById('record-form');
@@ -112,6 +113,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 map.setView(latlng, 15);
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
                 searchInput.value = result.display_name.split(',')[0];
+
+                // 検索結果にピンを立てる
+                if (searchMarker) map.removeLayer(searchMarker);
+                searchMarker = L.marker(latlng).addTo(map)
+                    .bindPopup(`<b>${searchInput.value}</b><br>ここを記録しますか？`)
+                    .openPopup();
+
                 if (window.innerWidth <= 768 && sidebar.classList.contains('open')) {
                     toggleSidebar();
                 }
@@ -158,6 +166,12 @@ document.addEventListener('DOMContentLoaded', () => {
         spots.push(newSpot);
         saveSpots();
         renderSpots();
+
+        // 検索ピンがあれば消す
+        if (searchMarker) {
+            map.removeLayer(searchMarker);
+            searchMarker = null;
+        }
 
         modal.classList.add('hidden');
         form.reset();

@@ -185,7 +185,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (popup) {
                     const content = popup.getContent();
                     const contentStr = (typeof content === 'string') ? content : (content instanceof HTMLElement ? content.innerHTML : '');
-                    if (!contentStr.includes('ここを記録しますか？')) {
+                    // 検索結果のピン（古いテキストまたは新しいボタンテキストを含むもの）は削除しない
+                    if (!contentStr.includes('ここを記録しますか？') && !contentStr.includes('openRecordFromPopup')) {
                         map.removeLayer(layer);
                     }
                 } else {
@@ -241,7 +242,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
                 if (searchMarker) map.removeLayer(searchMarker);
                 searchMarker = L.marker(latlng).addTo(map)
-                    .bindPopup(`<b>${result.display_name.split(',')[0]}</b><br><button class="primary-btn small-btn" style="margin-top: 10px; width: 100%;" onclick="openRecordFromPopup()">ここを記録する</button>`)
+                    .bindPopup(`<b>${result.display_name.split(',')[0]}</b><br><button type="button" class="primary-btn small-btn" style="margin-top: 10px; width: 100%;" onclick="openRecordFromPopup()">ここを記録する</button>`)
                     .openPopup();
                 return true;
             } else {

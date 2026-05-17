@@ -184,18 +184,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!map || !spotList) return;
         
         map.eachLayer((layer) => {
-            if (layer instanceof L.Marker) {
-                const popup = layer.getPopup();
-                if (popup) {
-                    const content = popup.getContent();
-                    const contentStr = (typeof content === 'string') ? content : (content instanceof HTMLElement ? content.innerHTML : '');
-                    // 検索結果のピン（古いテキストまたは新しいボタンテキストを含むもの）は削除しない
-                    if (!contentStr.includes('ここを記録しますか？') && !contentStr.includes('openRecordFromPopup')) {
-                        map.removeLayer(layer);
-                    }
-                } else {
-                    map.removeLayer(layer);
-                }
+            if (layer instanceof L.Marker && layer !== searchMarker) {
+                map.removeLayer(layer);
             }
         });
 
@@ -205,16 +195,48 @@ document.addEventListener('DOMContentLoaded', () => {
         sortedSpots.forEach(spot => {
             if (!spot.lat || !spot.lng) return;
             const marker = L.marker([spot.lat, spot.lng]).addTo(map);
-            const popupContent = `
-                <div class="custom-popup">
-                    <div style="font-size: 0.75rem; color: #888; margin-bottom: 2px;">${spot.date.replace(/-/g, '/')}</div>
-                    <strong style="font-size: 1rem;">${spot.title}</strong>
-                    <p style="margin: 5px 0; color: #666;">${spot.description}</p>
-                    ${spot.photo ? `<img src="${spot.photo}" style="width:100%; border-radius: 10px; margin-top: 5px;">` : ''}
-                    <button class="delete-btn" onclick="openDeleteConfirm(${spot.id})">削除する</button>
-                </div>
-            `;
-            marker.bindPopup(popupContent);
+            
+            const container = document.createElement('div');
+            container.className = 'custom-popup';
+            
+            const dateDiv = document.createElement('div');
+            dateDiv.style.fontSize = '0.75rem';
+            dateDiv.style.color = '#888';
+            dateDiv.style.marginBottom = '2px';
+            dateDiv.textContent = spot.date.replace(/-/g, '/');
+            container.appendChild(dateDiv);
+            
+            const titleEl = document.createElement('strong');
+            titleEl.style.fontSize = '1rem';
+            titleEl.textContent = spot.title;
+            container.appendChild(titleEl);
+            
+            const descP = document.createElement('p');
+            descP.style.margin = '5px 0';
+            descP.style.color = '#666';
+            descP.textContent = spot.description;
+            container.appendChild(descP);
+            
+            if (spot.photo) {
+                const img = document.createElement('img');
+                img.src = spot.photo;
+                img.style.width = '100%';
+                img.style.borderRadius = '10px';
+                img.style.marginTop = '5px';
+                container.appendChild(img);
+            }
+            
+            const deleteBtn = document.createElement('button');
+            deleteBtn.className = 'delete-btn';
+            deleteBtn.textContent = '削除する';
+            
+            L.DomEvent.on(deleteBtn, 'click', (e) => {
+                L.DomEvent.stopPropagation(e);
+                window.openDeleteConfirm(spot.id);
+            });
+            
+            container.appendChild(deleteBtn);
+            marker.bindPopup(container);
 
             const li = document.createElement('li');
             li.className = 'spot-item';
@@ -245,12 +267,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 map.setView(latlng, 15);
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
                 if (searchMarker) map.removeLayer(searchMarker);
+
                 const displayName = result.display_name.split(',')[0];
+                const container = document.createElement('div');
+
+                const titleEl = document.createElement('b');
+                titleEl.textContent = displayName;
+                container.appendChild(titleEl);
+                container.appendChild(document.createElement('br'));
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'primary-btn small-btn';
+                btn.style.marginTop = '10px';
+                btn.style.width = '100%';
+                btn.textContent = 'ここを記録する';
+
+                L.DomEvent.on(btn, 'click', (e) => {
+                    L.DomEvent.stopPropagation(e);
+                    window.openRecordFromPopup(displayName);
+                });
+
+                container.appendChild(btn);
+
                 searchMarker = L.marker(latlng).addTo(map)
-                    .bindPopup(`<b>${displayName}</b><br><button type="button" class="primary-btn small-btn" style="margin-top: 10px; width: 100%;" onclick="openRecordFromPopup('${displayName.replace(/'/g, "\\'")}')">ここを記録する</button>`)
+                    .bindPopup(container)
                     .openPopup();
                 return true;
-            } else {
+            }
+ else {
                 if (errorOverlay) errorOverlay.classList.remove('hidden');
             }
         } catch (error) {

@@ -52,6 +52,19 @@ document.addEventListener('DOMContentLoaded', () => {
         return el;
     };
 
+    function openRecordModal() {
+        const dateEl = document.getElementById('date');
+        if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
+        if (modal) modal.classList.remove('hidden');
+    }
+
+    // 外部から（ポップアップ等）呼び出せるようにグローバルに公開
+    window.openRecordFromPopup = () => {
+        isPreciseLocation = true;
+        openRecordModal();
+        map.closePopup();
+    };
+
     function toggleSidebar() {
         if (sidebar) sidebar.classList.toggle('open');
         if (sidebarOverlay) sidebarOverlay.classList.toggle('visible');
@@ -228,7 +241,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
                 if (searchMarker) map.removeLayer(searchMarker);
                 searchMarker = L.marker(latlng).addTo(map)
-                    .bindPopup(`<b>${result.display_name.split(',')[0]}</b><br>ここを記録しますか？`)
+                    .bindPopup(`<b>${result.display_name.split(',')[0]}</b><br><button class="primary-btn small-btn" style="margin-top: 10px; width: 100%;" onclick="openRecordFromPopup()">ここを記録する</button>`)
                     .openPopup();
                 return true;
             } else {
@@ -278,9 +291,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setListener('fab-add', 'click', () => {
         currentClickLatLng = map.getCenter();
         isPreciseLocation = false;
-        const dateEl = document.getElementById('date');
-        if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
-        if (modal) modal.classList.remove('hidden');
+        openRecordModal();
     });
 
     setListener('cancel-btn', 'click', () => {
@@ -376,9 +387,7 @@ document.addEventListener('DOMContentLoaded', () => {
     map.on('click', (e) => {
         currentClickLatLng = e.latlng;
         isPreciseLocation = true;
-        const dateEl = document.getElementById('date');
-        if (dateEl) dateEl.value = new Date().toISOString().split('T')[0];
-        if (modal) modal.classList.remove('hidden');
+        openRecordModal();
     });
 
     // 削除確認モーダル

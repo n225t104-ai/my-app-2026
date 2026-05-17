@@ -328,7 +328,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const titleEl = document.getElementById('title');
         if (titleEl && titleEl.value) {
             const found = await performSearch(titleEl.value);
-            if (found) isPreciseLocation = true;
+            if (found) {
+                isPreciseLocation = true;
+                // 検索結果を見せるために一旦モーダルを閉じる
+                if (modal) modal.classList.add('hidden');
+            }
         }
     });
 

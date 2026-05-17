@@ -59,9 +59,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // 外部から（ポップアップ等）呼び出せるようにグローバルに公開
-    window.openRecordFromPopup = () => {
+    window.openRecordFromPopup = (placeName) => {
         isPreciseLocation = true;
         openRecordModal();
+        const titleEl = document.getElementById('title');
+        if (titleEl && placeName) {
+            titleEl.value = placeName;
+        }
         map.closePopup();
     };
 
@@ -241,8 +245,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 map.setView(latlng, 15);
                 currentClickLatLng = { lat: latlng[0], lng: latlng[1] };
                 if (searchMarker) map.removeLayer(searchMarker);
+                const displayName = result.display_name.split(',')[0];
                 searchMarker = L.marker(latlng).addTo(map)
-                    .bindPopup(`<b>${result.display_name.split(',')[0]}</b><br><button type="button" class="primary-btn small-btn" style="margin-top: 10px; width: 100%;" onclick="openRecordFromPopup()">ここを記録する</button>`)
+                    .bindPopup(`<b>${displayName}</b><br><button type="button" class="primary-btn small-btn" style="margin-top: 10px; width: 100%;" onclick="openRecordFromPopup('${displayName.replace(/'/g, "\\'")}')">ここを記録する</button>`)
                     .openPopup();
                 return true;
             } else {

@@ -159,8 +159,8 @@ header p {
     z-index: 3000;
 }
 
-#gallery-overlay.hidden {
-    display: none;
+.hidden {
+    display: none !important;
 }
 
 #gallery-modal {
@@ -253,8 +253,9 @@ header p {
     z-index: 4000;
 }
 
-#confirm-overlay.hidden, #error-overlay.hidden {
-    display: none;
+/* 汎用的な非表示クラス */
+.hidden {
+    display: none !important;
 }
 
 #confirm-modal, #error-modal {
@@ -326,9 +327,6 @@ header p {
     z-index: 2000;
 }
 
-#modal-overlay.hidden {
-    display: none;
-}
 
 #input-modal {
     background: white;
@@ -542,9 +540,6 @@ button:hover {
     z-index: 3000;
 }
 
-#calendar-overlay.hidden {
-    display: none;
-}
 
 #calendar-modal {
     background: white;

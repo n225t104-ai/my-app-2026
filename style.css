@@ -567,6 +567,15 @@ button:hover {
         -webkit-appearance: none;
         min-height: 44px; /* Apple's recommended tap target size */
     }
+
+    .calendar-nav {
+        gap: 10px;
+    }
+
+    #calendar-month-year {
+        font-size: 1.1rem;
+        white-space: nowrap;
+    }
 }
 
 /* Calendar Modal Styles */

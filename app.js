@@ -390,41 +390,69 @@ document.addEventListener('DOMContentLoaded', () => {
     if (form) {
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            const title = document.getElementById('title').value;
-            const date = document.getElementById('date').value;
-            const description = document.getElementById('description').value;
-            const photoFile = document.getElementById('photo').files[0];
-
-            if (!isPreciseLocation) {
-                await performSearch(title);
+            
+            const submitBtn = form.querySelector('button[type="submit"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '保存中...';
             }
 
-            let photoBase64 = '';
-            if (photoFile) {
-                photoBase64 = await resizeImage(photoFile);
+            try {
+                const title = document.getElementById('title').value;
+                const date = document.getElementById('date').value;
+                const description = document.getElementById('description').value;
+                const photoFile = document.getElementById('photo').files[0];
+
+                // 位置情報が確定していない場合は検索を試みる
+                if (!isPreciseLocation) {
+                    await performSearch(title);
+                }
+
+                // それでも位置情報がない場合は現在の地図の中心を使用
+                if (!currentClickLatLng) {
+                    currentClickLatLng = map.getCenter();
+                }
+
+                let photoBase64 = '';
+                if (photoFile) {
+                    try {
+                        photoBase64 = await resizeImage(photoFile);
+                    } catch (err) {
+                        console.error('Image resize error:', err);
+                        // 画像リサイズに失敗しても記録は続ける
+                    }
+                }
+
+                const newSpot = {
+                    id: Date.now(),
+                    lat: currentClickLatLng.lat,
+                    lng: currentClickLatLng.lng,
+                    title,
+                    date,
+                    description,
+                    photo: photoBase64
+                };
+
+                spots.push(newSpot);
+                saveSpots();
+                renderSpots();
+
+                if (searchMarker) {
+                    map.removeLayer(searchMarker);
+                    searchMarker = null;
+                }
+
+                if (modal) modal.classList.add('hidden');
+                form.reset();
+            } catch (error) {
+                console.error('Submit error:', error);
+                alert('エラーが発生しました。もう一度お試しください。');
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = '記録する';
+                }
             }
-
-            const newSpot = {
-                id: Date.now(),
-                lat: currentClickLatLng.lat,
-                lng: currentClickLatLng.lng,
-                title,
-                date,
-                description,
-                photo: photoBase64
-            };
-
-            spots.push(newSpot);
-            saveSpots();
-            renderSpots();
-
-            if (searchMarker) {
-                map.removeLayer(searchMarker);
-                searchMarker = null;
-            }
-
-            if (modal) modal.classList.add('hidden');
-            form.reset();
         });
     }
 
@@ -453,7 +481,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     function resizeImage(file) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
@@ -474,7 +502,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     ctx.drawImage(img, 0, 0, width, height);
                     resolve(canvas.toDataURL('image/jpeg', 0.7));
                 };
+                img.onerror = () => reject(new Error('画像の読み込みに失敗しました'));
             };
+            reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました'));
         });
     }
 

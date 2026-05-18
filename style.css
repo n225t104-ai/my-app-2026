@@ -398,6 +398,7 @@ header p {
         max-width: 320px;
         transition: left 0.3s ease;
         z-index: 2500;
+        border-radius: 0 var(--border-radius) var(--border-radius) 0;
     }
 
     #sidebar.open {
@@ -406,25 +407,31 @@ header p {
 
     #sidebar-toggle {
         position: absolute;
-        top: 20px;
+        top: 15px;
         left: 15px;
         z-index: 1500;
         background: white;
-        width: 45px;
-        height: 45px;
+        width: 40px;
+        height: 40px;
         border-radius: 50%;
         box-shadow: var(--shadow);
         justify-content: center;
         align-items: center;
-        font-size: 1.2rem;
+        font-size: 1.1rem;
         border: none;
         cursor: pointer;
     }
 
     #search-container {
-        width: 70%;
-        left: calc(50% + 25px); /* Offset to avoid toggle button */
-        top: 20px;
+        width: calc(100% - 100px);
+        left: calc(50% + 25px);
+        top: 15px;
+        padding: 4px 12px;
+    }
+
+    .modal-content {
+        padding: 20px;
+        width: 95%;
     }
 
     #gallery-modal {
@@ -441,10 +448,12 @@ header p {
     #fab-add {
         bottom: 20px;
         right: 20px;
+        width: 50px;
+        height: 50px;
     }
 
-    #input-modal {
-        padding: 20px;
+    .leaflet-popup-content {
+        width: 200px !important;
     }
 }
 

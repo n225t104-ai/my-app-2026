@@ -364,6 +364,103 @@ header p {
     display: block;
 }
 
+/* Floating Action Button */
+#fab-add {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--accent-color);
+    color: white;
+    font-size: 1.8rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(135, 206, 235, 0.4);
+    z-index: 1000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+#fab-add:hover {
+    transform: rotate(90deg) scale(1.1);
+}
+
+/* Button Styles */
+.button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+button {
+    padding: 12px 20px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    flex: 1;
+    transition: opacity 0.2s;
+    font-family: inherit;
+}
+
+button:hover {
+    opacity: 0.8;
+}
+
+.primary-btn {
+    background: var(--accent-color);
+    color: white;
+}
+
+.secondary-btn {
+    background: #f0f0f0;
+    color: var(--primary-color);
+}
+
+.delete-btn-modal {
+    background: #ff7675;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.small-btn {
+    flex: 0 0 auto;
+    width: auto;
+    padding: 0 15px;
+    font-size: 0.85rem;
+}
+
+.input-with-button {
+    display: flex;
+    gap: 8px;
+}
+
+.hint {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 4px;
+}
+
+.delete-btn {
+    color: #ff7675;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    margin-top: 10px;
+    font-weight: bold;
+    text-align: left;
+    padding: 0;
+}
+
 /* Sidebar Overlay when open */
 .sidebar-overlay {
     position: fixed;

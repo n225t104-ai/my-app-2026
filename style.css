@@ -561,6 +561,12 @@ button:hover {
     .leaflet-popup-content {
         width: 200px !important;
     }
+
+    .form-group input[type="date"] {
+        appearance: none;
+        -webkit-appearance: none;
+        min-height: 44px; /* Apple's recommended tap target size */
+    }
 }
 
 /* Calendar Modal Styles */

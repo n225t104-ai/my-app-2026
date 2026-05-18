@@ -199,36 +199,31 @@ document.addEventListener('DOMContentLoaded', () => {
             const container = document.createElement('div');
             container.className = 'custom-popup';
             
-            const dateDiv = document.createElement('div');
-            dateDiv.style.fontSize = '0.75rem';
-            dateDiv.style.color = '#888';
-            dateDiv.style.marginBottom = '2px';
+            const dateDiv = document.createElement('span');
+            dateDiv.className = 'custom-popup-date';
             dateDiv.textContent = spot.date.replace(/-/g, '/');
             container.appendChild(dateDiv);
             
-            const titleEl = document.createElement('strong');
-            titleEl.style.fontSize = '1rem';
+            const titleEl = document.createElement('span');
+            titleEl.className = 'custom-popup-title';
             titleEl.textContent = spot.title;
             container.appendChild(titleEl);
             
             const descP = document.createElement('p');
-            descP.style.margin = '5px 0';
-            descP.style.color = '#666';
+            descP.className = 'custom-popup-desc';
             descP.textContent = spot.description;
             container.appendChild(descP);
             
             if (spot.photo) {
                 const img = document.createElement('img');
                 img.src = spot.photo;
-                img.style.width = '100%';
-                img.style.borderRadius = '10px';
-                img.style.marginTop = '5px';
+                img.className = 'custom-popup-img';
                 container.appendChild(img);
             }
             
             const deleteBtn = document.createElement('button');
             deleteBtn.className = 'delete-btn';
-            deleteBtn.textContent = '削除する';
+            deleteBtn.textContent = '記録を削除する';
             
             L.DomEvent.on(deleteBtn, 'click', (e) => {
                 L.DomEvent.stopPropagation(e);
@@ -270,16 +265,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const displayName = result.display_name.split(',')[0];
                 const container = document.createElement('div');
+                container.className = 'custom-popup';
 
-                const titleEl = document.createElement('b');
+                const titleEl = document.createElement('span');
+                titleEl.className = 'custom-popup-title';
                 titleEl.textContent = displayName;
                 container.appendChild(titleEl);
-                container.appendChild(document.createElement('br'));
+
+                const descP = document.createElement('p');
+                descP.className = 'custom-popup-desc';
+                descP.textContent = 'この場所を記録しますか？';
+                container.appendChild(descP);
 
                 const btn = document.createElement('button');
                 btn.type = 'button';
                 btn.className = 'primary-btn small-btn';
-                btn.style.marginTop = '10px';
                 btn.style.width = '100%';
                 btn.textContent = 'ここを記録する';
 

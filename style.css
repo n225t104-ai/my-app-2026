@@ -314,13 +314,16 @@ header p {
 .form-group input[type="text"],
 .form-group input[type="date"],
 .form-group textarea {
+    display: block;
     width: 100%;
+    max-width: 100%;
     padding: 12px;
     border: 1px solid #eee;
     border-radius: 12px;
     font-size: 0.95rem;
     background: #f9f9f9;
     font-family: inherit;
+    box-sizing: border-box;
 }
 
 /* Leaflet Popup customization */
@@ -441,6 +444,12 @@ button:hover {
 .input-with-button {
     display: flex;
     gap: 8px;
+    width: 100%;
+}
+
+.input-with-button input {
+    flex: 1;
+    min-width: 0;
 }
 
 .hint {

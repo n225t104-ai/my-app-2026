@@ -465,9 +465,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
             } catch (error) {
                 console.error('Submit error:', error);
-                // saveSpots内ですでに特定のアラートを出している場合は、ここでは出さないか汎用的なものを出す
+                // saveSpots内でアラートを出しているため、ここでは詳細なエラーのみを表示
                 if (error.name !== 'QuotaExceededError' && error.name !== 'SecurityError') {
-                    alert('エラーが発生しました。もう一度お試しください。');
+                    alert('エラーが発生しました: ' + (error.message || '不明なエラー'));
                 }
             } finally {
                 if (submitBtn) {
@@ -522,6 +522,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7));
+                };
+                img.onerror = () => reject(new Error('画像の読み込みに失敗しました'));
+            };
+            reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました'));
+        });
+    }
+
+    renderSpots();
+});
+t);
                     resolve(canvas.toDataURL('image/jpeg', 0.7));
                 };
                 img.onerror = () => reject(new Error('画像の読み込みに失敗しました'));

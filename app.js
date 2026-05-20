@@ -419,6 +419,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     const found = await performSearch(title);
                     if (!found) {
                         // 場所が見つからない場合は処理を中断（エラーモーダルはperformSearch内で表示済み）
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = '記録する';
+                        }
                         return;
                     }
                 }

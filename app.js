@@ -177,7 +177,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function saveSpots() {
-        localStorage.setItem('travel_spots', JSON.stringify(spots));
+        try {
+            localStorage.setItem('travel_spots', JSON.stringify(spots));
+        } catch (e) {
+            console.error('Failed to save spots:', e);
+            if (e.name === 'QuotaExceededError') {
+                alert('保存容量がいっぱいです。不要な記録を削除するか、写真を減らしてください。');
+            } else {
+                alert('データの保存に失敗しました。ブラウザの設定を確認してください。');
+            }
+            throw e;
+        }
     }
 
     function renderSpots() {
@@ -252,9 +262,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     async function performSearch(query) {
-        if (!query) return;
+        if (!query) return false;
         try {
             const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}`);
+            if (!response.ok) throw new Error('Network response was not ok');
             const data = await response.json();
             if (data && data.length > 0) {
                 const result = data[0];
@@ -294,15 +305,15 @@ document.addEventListener('DOMContentLoaded', () => {
                     .bindPopup(container)
                     .openPopup();
                 return true;
-            }
- else {
+            } else {
                 if (errorOverlay) errorOverlay.classList.remove('hidden');
+                return false;
             }
         } catch (error) {
             console.error('Search error:', error);
             if (errorOverlay) errorOverlay.classList.remove('hidden');
+            return false;
         }
-        return false;
     }
 
     // イベントリスナー登録
@@ -405,7 +416,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // 位置情報が確定していない場合は検索を試みる
                 if (!isPreciseLocation) {
-                    await performSearch(title);
+                    const found = await performSearch(title);
+                    if (!found) {
+                        // 場所が見つからない場合は処理を中断（エラーモーダルはperformSearch内で表示済み）
+                        return;
+                    }
                 }
 
                 // それでも位置情報がない場合は現在の地図の中心を使用
@@ -446,7 +461,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 form.reset();
             } catch (error) {
                 console.error('Submit error:', error);
-                alert('エラーが発生しました。もう一度お試しください。');
+                // saveSpots内ですでに特定のアラートを出している場合は、ここでは出さないか汎用的なものを出す
+                if (error.name !== 'QuotaExceededError' && error.name !== 'SecurityError') {
+                    alert('エラーが発生しました。もう一度お試しください。');
+                }
             } finally {
                 if (submitBtn) {
                     submitBtn.disabled = false;

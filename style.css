@@ -253,6 +253,10 @@ header p {
     z-index: 3000;
 }
 
+#error-overlay, #confirm-overlay {
+    z-index: 4000;
+}
+
 .modal-content {
     background: white;
     padding: 30px;

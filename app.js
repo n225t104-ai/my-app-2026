@@ -178,14 +178,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function saveSpots() {
         try {
-            localStorage.setItem('travel_spots', JSON.stringify(spots));
+            const data = JSON.stringify(spots);
+            localStorage.setItem('travel_spots', data);
         } catch (e) {
             console.error('Failed to save spots:', e);
+            let msg = 'データの保存に失敗しました。';
             if (e.name === 'QuotaExceededError') {
-                alert('保存容量がいっぱいです。不要な記録を削除するか、写真を減らしてください。');
-            } else {
-                alert('データの保存に失敗しました。ブラウザの設定を確認してください。');
+                msg = '保存容量がいっぱいです。不要な記録を削除するか、写真を減らしてください。';
+            } else if (e.name === 'SecurityError') {
+                msg = 'ブラウザの設定により、データの保存がブロックされています。プライベートモードを解除するか、設定を確認してください。';
             }
+            alert(msg);
             throw e;
         }
     }
@@ -200,7 +203,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         spotList.innerHTML = '';
-        const sortedSpots = [...spots].sort((a, b) => new Date(b.date) - new Date(a.date));
+        const sortedSpots = [...spots]
+            .filter(s => s && s.date)
+            .sort((a, b) => new Date(b.date) - new Date(a.date));
 
         sortedSpots.forEach(spot => {
             if (!spot.lat || !spot.lng) return;
@@ -522,17 +527,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     canvas.height = height;
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
-                    resolve(canvas.toDataURL('image/jpeg', 0.7));
-                };
-                img.onerror = () => reject(new Error('画像の読み込みに失敗しました'));
-            };
-            reader.onerror = () => reject(new Error('ファイルの読み込みに失敗しました'));
-        });
-    }
-
-    renderSpots();
-});
-t);
                     resolve(canvas.toDataURL('image/jpeg', 0.7));
                 };
                 img.onerror = () => reject(new Error('画像の読み込みに失敗しました'));
